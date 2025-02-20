@@ -1,4 +1,4 @@
-function beamAnalysis
+function [w1,w2,theta,xc,yc]=beamAnalysis
 
 ext = 'tif';
 newdir=uigetdir(pwd,'select folder of images');
@@ -20,6 +20,9 @@ end
 
 w1=zeros(length(imgs),1);
 w2=zeros(length(imgs),1);
+xc=zeros(length(imgs),1);
+yc=zeros(length(imgs),1);
+theta=zeros(length(imgs),1);
 
 for kk=1:length(imgs)
    Z = double(imgs{kk});
@@ -44,18 +47,23 @@ for kk=1:length(imgs)
 
     w1(kk)=2*fout.s1;
     w2(kk)=2*fout.s2;
+    theta(kk)=fout.theta;
+    
+    xc(kk)=fout.Xc;
+    yc(kk)=fout.Yc;
     
     disp('%%%%%%%%%%%%%%%%%%%%%%%%%%');    
     disp(filenames{kk});
-    disp(w1(kk));
-    disp(w2(kk));
+    disp(fout);
+    disp(['waist 1 (px) : ' num2str(w1(kk))]);
+    disp(['waist 1 (px) : ' num2str(w2(kk))]);
+    disp(['theta  (rad) : ' num2str(theta(kk))]);
+    disp(['xc (px) : ' num2str(xc(kk))]);
+    disp(['yc (px) : ' num2str(yc(kk))]);
 
 end
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%');    
 
-disp(w1)
-disp(w2)
-disp(filenames)
 
 end
 
@@ -88,17 +96,6 @@ function fout=fit2DGauss(X,Y,Z)
 
     % Copy the data
     Z2=Z;xx2=xx;yy2=yy;
-% 
-%     Xc
-%     Yc
-%     
-%     Xc = 300;
-%     Yc = 600;
-%     s1 = 50;
-%     s2 = 50;
-%     theta = 0;
-%     bg = 0
-    
 
     % https://en.wikipedia.org/wiki/Gaussian_function
     % But we add a minus sign to make it counter clockwise angle
@@ -111,8 +108,9 @@ function fout=fit2DGauss(X,Y,Z)
     myfit=fittype(@(A,Xc,Yc,s1,s2,theta,nbg,xx,yy) gaussrot(A,Xc,Yc,s1,s2,theta,nbg,xx,yy),...
         'independent',{'xx','yy'},'coefficients',{'A','Xc','Yc','s1','s2','theta','nbg'});
     opt=fitoptions(myfit);
-    opt.StartPoint=[A Xc Yc s1 s2 theta nbg]
-    opt.Upper=[A*1.3 Xc+50 Yc+50 s1*5.5 s2*5.5 theta+5*(pi/180) 2];
+
+    opt.StartPoint=[A Xc Yc s1 s2 theta nbg];
+    opt.Upper=[A*1.3 Xc+50 Yc+50 s1*5.5 s2*5.5 theta+5*(pi/180) 200];
     opt.Lower=[A*0.7 Xc-50 Yc-50 s1*.5 s2*.5 theta-5*(pi/180) -2];
 
     % Display initial guess  
