@@ -1,4 +1,4 @@
-function [w1,w2,theta,xc,yc]=beamAnalysis
+function beamAnalysis
 
 %camera pixel size
 % For the camera pixel i would recommend writing a text file in the
@@ -10,6 +10,7 @@ function [w1,w2,theta,xc,yc]=beamAnalysis
 [filename,mydir,~] = uigetfile({'*.tif';'*.tiff'});
 Z = imread(fullfile(mydir,filename));
 Z = double(Z);
+% Z = double(Z(:,:,1));
 
 % Z=imrotate(Z,15);
 
@@ -34,7 +35,6 @@ Xc = fout.Xc;
 Yc = fout.Yc;
 
 nbg = fout.nbg;
-
 
 Zfit = feval(fout,XX,YY);
 
@@ -102,12 +102,17 @@ t.Data{2,1}='w2 (px)';
 t.Data{3,1}='theta (deg)';
 t.Data{4,1}='bg';
 t.Data{5,1}='amp';
+t.Data{6,1}='Xc';
+t.Data{7,1}='Yc';
 
 t.Data{1,2}=w1;
 t.Data{2,2}=w2;
 t.Data{3,2}=theta*180/pi;
 t.Data{4,2}=nbg;
 t.Data{5,2}=fout.A;
+t.Data{6,2}=Xc;
+t.Data{7,2}=Yc;
+
 
 
 
